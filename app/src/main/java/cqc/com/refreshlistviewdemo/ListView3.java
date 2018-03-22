@@ -1,11 +1,9 @@
 package cqc.com.refreshlistviewdemo;
 
 import android.content.Context;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -31,7 +29,7 @@ import android.widget.TextView;
  * 刷新你中：headerView完全显示出来，手指离开屏幕 ACTION_UP
  */
 
-public class RefreshListView extends ListView implements AbsListView.OnScrollListener {
+public class ListView3 extends ListView implements AbsListView.OnScrollListener {
 
     //header
     private View headerView;
@@ -41,14 +39,6 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
     private int headerViewHeight;
     private ProgressBar progressBarHeader;
 
-    //footer
-    private View footerView;
-    private int footerViewHeight;
-
-
-    private int downY;
-    private int moveY;
-
     //设置3种下拉刷新状态
     public final int DOWN_REFRESH = 1;
     public final int RELEASE_REFRESH = 2;
@@ -56,15 +46,29 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
     private int currentState = DOWN_REFRESH;//当前状态是下拉刷新
 
 
-    public RefreshListView(Context context) {
+    //footer
+    private View footerView;
+    private int footerViewHeight;
+
+    //当前是不是上拉加载中
+    public final  int LOAD_MORE=4;
+    public final  int LOAD_MORE_REFRESHING = 5;
+    private  int currentState2 = LOAD_MORE;
+
+
+    private int downY;
+    private int moveY;
+
+
+    public ListView3(Context context) {
         this(context, null);
     }
 
-    public RefreshListView(Context context, AttributeSet attrs) {
+    public ListView3(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public RefreshListView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public ListView3(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         LogUtil.d("RefreshListView");
         initHeaderView();
@@ -105,9 +109,9 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
             case MotionEvent.ACTION_MOVE:
                 moveY = (int) ev.getY();
                 int instance = moveY - downY;
-                int paddingTop = -headerViewHeight + instance;
 
                 if (instance > 0 && getFirstVisiblePosition() == 0 && currentState != REFRESHING) {
+                    int paddingTop = -headerViewHeight + instance;
                     if (paddingTop < 0 && currentState != DOWN_REFRESH) {
                         currentState = DOWN_REFRESH;
                         //下拉刷新
@@ -181,9 +185,9 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         if (scrollState == SCROLL_STATE_FLING || scrollState == SCROLL_STATE_IDLE) {
-            if (getLastVisiblePosition() == getCount() - 1) {
+            if (getLastVisiblePosition() == getCount() - 1  &&  currentState2==LOAD_MORE) {
+                currentState2= LOAD_MORE_REFRESHING;
                 footerView.setPadding(0, 0, 0, 0);
-//                smoothScrollToPosition(getCount());
                 setSelection(getCount());
                 if (onLoadMoreListener != null) {
                     onLoadMoreListener.onLoadMore();
@@ -213,6 +217,7 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
     //结束加载更多
     public void finishLoadMore() {
         footerView.setPadding(0, -footerViewHeight, 0, 0);
+        currentState2= LOAD_MORE;
     }
 
 }
