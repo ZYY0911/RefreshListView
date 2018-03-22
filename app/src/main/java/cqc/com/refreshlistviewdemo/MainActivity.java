@@ -1,6 +1,7 @@
 package cqc.com.refreshlistviewdemo;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -21,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
     private List<String> dataList =  new ArrayList<>();
     private MyAdapter adapter;
 
-    //    private List<String> dataList= new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,36 +39,35 @@ public class MainActivity extends AppCompatActivity {
         adapter = new MyAdapter();
         listView.setAdapter(adapter);
 
-//        listView.setOnRefreshListener(new RefreshListView.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        ToastUtil.showShortToast(context, "刷新成功");
-////                        dataList.add("header  header  header");
-//                        dataList.add(0,"header  header  header");
-//                        adapter.notifyDataSetChanged();
-//                        listView.finishRefresh();
-//                    }
-//                }, 2000);
-//            }
-//        });
-//
-//        listView.setOnLoadMoreListener(new RefreshListView.OnLoadMoreListener() {
-//            @Override
-//            public void onLoadMore() {
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        ToastUtil.showShortToast(context, "上拉加载成功");
-//                        dataList.add("footer  footer  footer  ");
-//                        adapter.notifyDataSetChanged();
-//                        listView.finishLoadMore();
-//                    }
-//                }, 2000);
-//            }
-//        });
+        listView.setOnRefreshListener(new ListView3.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        ToastUtil.showShortToast(context, "刷新成功");
+                        dataList.add(0,"header  header  header");
+                        adapter.notifyDataSetChanged();
+                        listView.finishRefresh();
+                    }
+                }, 2000);
+            }
+        });
+
+        listView.setOnLoadMoreListener(new ListView3.OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        ToastUtil.showShortToast(context, "上拉加载成功");
+                        dataList.add("footer  footer  footer  ");
+                        adapter.notifyDataSetChanged();
+                        listView.finishLoadMore();
+                    }
+                }, 2000);
+            }
+        });
     }
 
 
